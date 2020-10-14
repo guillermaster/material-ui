@@ -175,10 +175,10 @@ describe('<Drawer />', () => {
     );
 
     it('should render a div instead of a Modal when persistent', () => {
-      const wrapper = mount(drawerElement);
+      const { container } = render(drawerElement);
       const root = findOutermostIntrinsic(wrapper);
-      expect(root.type()).to.equal('div');
-      expect(root.hasClass(classes.docked)).to.equal(true);
+      const root = container.querySelector(`div.${classes.docked}`);
+      expect(root).to.not.be.undefined;
     });
 
     it('should render Slide > Paper inside the div', () => {
@@ -202,17 +202,16 @@ describe('<Drawer />', () => {
     );
 
     it('should render a div instead of a Modal when permanent', () => {
-      const wrapper = mount(drawerElement);
-      const root = wrapper.find(`.${classes.root}`);
-      expect(root.type()).to.equal('div');
-      expect(root.hasClass(classes.docked)).to.equal(true);
+      const { container } = render(drawerElement);
+      const root = container.querySelector(`.${classes.root}`);
+      expect(root).to.have.class(classes.docked);
+      
     });
 
     it('should render div > Paper inside the div', () => {
-      const wrapper = mount(drawerElement);
-
-      const root = wrapper.find(`div.${classes.root}`);
-      expect(root.exists()).to.equal(true);
+      const { container } = render(drawerElement);
+      const root = container.querySelector(`div.${classes.root}`);
+      expect(root).to.not.be.undefined;
     });
   });
 
@@ -228,51 +227,55 @@ describe('<Drawer />', () => {
   });
 
   describe('slide direction', () => {
-    it('should return the opposing slide direction', () => {
-      const wrapper = mount(
-        <Drawer open>
+    it('should slide from left to right', () => {
+      const { container } = render(
+        <Drawer open anchor="left">
           <div />
-        </Drawer>,
+        </Drawer>
       );
 
-      wrapper.setProps({ anchor: 'left' });
-      expect(wrapper.find(Slide).props().direction).to.equal('right');
+      console.log(classes);
 
-      wrapper.setProps({ anchor: 'right' });
-      expect(wrapper.find(Slide).props().direction).to.equal('left');
+      expect(container.querySelector(`.${classes.paperAnchorRight}`)).to.not.be.undefined;
 
-      wrapper.setProps({ anchor: 'top' });
-      expect(wrapper.find(Slide).props().direction).to.equal('down');
+      // wrapper.setProps({ anchor: 'left' });
+      // expect(wrapper.find(Slide).props().direction).to.equal('right');
 
-      wrapper.setProps({ anchor: 'bottom' });
-      expect(wrapper.find(Slide).props().direction).to.equal('up');
+      // wrapper.setProps({ anchor: 'right' });
+      // expect(wrapper.find(Slide).props().direction).to.equal('left');
+
+      // wrapper.setProps({ anchor: 'top' });
+      // expect(wrapper.find(Slide).props().direction).to.equal('down');
+
+      // wrapper.setProps({ anchor: 'bottom' });
+      // expect(wrapper.find(Slide).props().direction).to.equal('up');
     });
-  });
 
-  describe('Right To Left', () => {
-    it('should switch left and right anchor when theme is right-to-left', () => {
-      const theme = createMuiTheme({
-        direction: 'rtl',
-      });
-      const wrapper1 = mount(
-        <ThemeProvider theme={theme}>
-          <Drawer open anchor="left">
-            <div />
-          </Drawer>
-        </ThemeProvider>,
+    it('should slide from right to left', () => {
+      const { container } = render(
+        <Drawer open anchor="right">
+          <div />
+        </Drawer>
       );
-      // slide direction for left is right, if left is switched to right, we should get left
-      expect(wrapper1.find(Slide).props().direction).to.equal('left');
+      expect(container.querySelector(`.${classes.paperAnchorLeft}`)).to.not.be.undefined;
+    });
 
-      const wrapper2 = mount(
-        <ThemeProvider theme={theme}>
-          <Drawer open anchor="right">
-            <div />
-          </Drawer>
-        </ThemeProvider>,
+    it('should slide top right to bottom', () => {
+      const { container } = render(
+        <Drawer open anchor="top">
+          <div />
+        </Drawer>
       );
-      // slide direction for right is left, if right is switched to left, we should get right
-      expect(wrapper2.find(Slide).props().direction).to.equal('right');
+      expect(container.querySelector(`.${classes.paperAnchorBottom}`)).to.not.be.undefined;
+    });
+
+    it('should slide from bottom to top', () => {
+      const { container } = render(
+        <Drawer open anchor="bottom">
+          <div />
+        </Drawer>
+      );
+      expect(container.querySelector(`.${classes.paperAnchorTop}`)).to.not.be.undefined;
     });
   });
 
